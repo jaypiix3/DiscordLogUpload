@@ -1,22 +1,37 @@
-﻿using DiscordLogUpload.Services;
+﻿using DiscordLogUpload.Models;
+using DiscordLogUpload.Services;
+using System.Text.Json;
 
-//Services
+// Services
 DiscordService discordService = new DiscordService();
 FileService fileService = new FileService();
-// Configuration
-string logFileName = "autoexec_server.log";
-string logPath = "C:\\logs\\";
-string backupFolder = "C:\\logs\\backup";
-string discordWebhookUrl = "https://discord.com/api/webhooks/1345022493521608745/Gu2-p5ZTbH5kBdu1GOhB-FtST9EkPUSaKaMSW4BYgtG0GE3d20KYY31dAUMmnJhonUVh";  // Your Discord webhook
 
+// Configuration
 Console.WriteLine("Discord Log-Upload Tool started...");
 
-var logFilePath = Path.Combine(logPath, logFileName);
-var destinationFilePath = Path.Combine(backupFolder, logFileName);
+if (fileService.FileExists("config.json") == false) return;
+
+// Loading Config
+Console.WriteLine("Loading Config File...");
+
+string jsonString = File.ReadAllText("config.json");
+Config config = JsonSerializer.Deserialize<Config>(jsonString);
+
+if (config == null)
+{
+    Console.WriteLine("Failed to load config file. Exiting...");
+    return;
+}
+
+Console.WriteLine("Config file loaded successfully.");
+
+// Main Logic
+var logFilePath = Path.Combine(config.LogPath, config.LogFileName);
+var destinationFilePath = Path.Combine(config.BackupFolder, config.LogFileName);
 
 if (fileService.FileExists(logFilePath))
 {
-    var success = await discordService.SendFileToDiscord(discordWebhookUrl, logFilePath);
+    var success = await discordService.SendFileToDiscord(config.DiscordWebhookUrl, logFilePath);
 
     if (success)
     {
