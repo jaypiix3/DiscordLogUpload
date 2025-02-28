@@ -38,6 +38,11 @@ if (fileService.FileExists(logFilePath))
         return;
     }
 
+    if (fileService.FileHasContent(copyFilePath) == false)
+    {
+        Console.WriteLine("File will not be uploaded since it is empty. Exiting...");
+        return;
+    }
     var success = await discordService.SendFileToDiscord(config.DiscordWebhookUrl, copyFilePath!);
 
     if (success)

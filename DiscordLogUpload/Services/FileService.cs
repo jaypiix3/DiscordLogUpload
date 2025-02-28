@@ -77,4 +77,14 @@ public class FileService
             Console.WriteLine("New file created.");
         }
     }
+
+    public bool FileHasContent(string filePath) 
+    {
+        if (new FileInfo(filePath).Length == 0)
+        {
+            return false;
+        }
+
+        return true;
+    }
 }
