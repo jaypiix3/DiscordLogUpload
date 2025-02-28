@@ -62,19 +62,18 @@ public class FileService
     {
         try
         {
-            File.Delete(filePath);
-            Console.WriteLine("Old file deleted successfully.");
-            return true;
+            // Open the file with shared read/write access, so other processes can still use it
+            using (FileStream fs = new FileStream(filePath, FileMode.Open, FileAccess.Write, FileShare.ReadWrite))
+            {
+                fs.SetLength(0);
+                Console.WriteLine("File content cleared successfully.");
+                return true;
+            }
         }
-        catch (Exception ex)
+        catch (IOException ex)
         {
-            Console.WriteLine("Failed to delete old file: " + ex.Message);
+            Console.WriteLine($"Error: {ex.Message}");
             return false;
-        }
-        finally
-        {
-            File.Create(filePath);
-            Console.WriteLine("New file created.");
         }
     }
 
