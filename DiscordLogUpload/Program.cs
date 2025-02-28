@@ -30,11 +30,19 @@ var logFilePath = Path.Combine(config.LogPath, config.LogFileName);
 
 if (fileService.FileExists(logFilePath))
 {
-    var success = await discordService.SendFileToDiscord(config.DiscordWebhookUrl, logFilePath);
+    var copyFilePath = fileService.ArchiveLogFileByCopy(logFilePath, config.BackupFolder);
+
+    if (copyFilePath == null)
+    {
+        Console.WriteLine("Failed to archive file. Exiting...");
+        return;
+    }
+
+    var success = await discordService.SendFileToDiscord(config.DiscordWebhookUrl, copyFilePath!);
 
     if (success)
     {
-        fileService.ArchiveLogFile(logFilePath, config.BackupFolder);
+        fileService.CleanUpOldFiles(logFilePath);
     }
 }
 
