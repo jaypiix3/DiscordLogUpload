@@ -15,8 +15,11 @@ public class FileService
         }
     }
 
-    public bool ArchiveLogFile(string logFilePath, string destinationFilePath)
+    public bool ArchiveLogFile(string logFilePath, string destinationFolderPath)
     {
+        string formattedDateFileString = DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss");
+        string destinationFilePath = Path.Combine(destinationFolderPath, "autoexec_server_" + formattedDateFileString + ".log");
+
         try
         {
             File.Move(logFilePath, destinationFilePath);

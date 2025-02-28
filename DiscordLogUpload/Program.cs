@@ -27,7 +27,6 @@ Console.WriteLine("Config file loaded successfully.");
 
 // Main Logic
 var logFilePath = Path.Combine(config.LogPath, config.LogFileName);
-var destinationFilePath = Path.Combine(config.BackupFolder, config.LogFileName);
 
 if (fileService.FileExists(logFilePath))
 {
@@ -35,7 +34,7 @@ if (fileService.FileExists(logFilePath))
 
     if (success)
     {
-        fileService.ArchiveLogFile(logFilePath, destinationFilePath);
+        fileService.ArchiveLogFile(logFilePath, config.BackupFolder);
     }
 }
 
