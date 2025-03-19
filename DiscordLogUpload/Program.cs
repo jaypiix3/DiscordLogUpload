@@ -8,13 +8,17 @@ FileService fileService = new FileService();
 
 // Configuration
 Console.WriteLine("Discord Log-Upload Tool started...");
+string configFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "config.json");
 
-if (fileService.FileExists("config.json") == false) return;
+if (fileService.FileExists(configFilePath) == false)
+{
+    return;
+}
 
 // Loading Config
 Console.WriteLine("Loading Config File...");
 
-string jsonString = File.ReadAllText("config.json");
+string jsonString = File.ReadAllText(configFilePath);
 Config config = JsonSerializer.Deserialize<Config>(jsonString);
 
 if (config == null)
@@ -38,6 +42,22 @@ if (fileService.FileExists(logFilePath))
         return;
     }
 
+    //Insert name-ip to postgresql
+    var connections = fileService.ParseLogFileNew(copyFilePath);
+    if (connections.Count > 0)
+    {
+        DatabaseService databaseService = new DatabaseService();
+        databaseService.SetAllConnectionOld();
+        databaseService.InsertNameIp(connections);
+    }
+
+    var messages = fileService.ParseMessagesFromLog(copyFilePath);
+    if (messages.Count > 0 && messages[0] != null)
+    {
+        DatabaseService databaseService = new DatabaseService();
+        databaseService.InsertMessages(messages);
+    }
+
     if (fileService.FileHasContent(copyFilePath) == false)
     {
         Console.WriteLine("File will not be uploaded since it is empty. Exiting...");
@@ -51,5 +71,4 @@ if (fileService.FileExists(logFilePath))
     }
 }
 
-Console.WriteLine("Press any key to exit...");
-Console.ReadLine();
+
